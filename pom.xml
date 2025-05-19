@@ -13,6 +13,7 @@
         <module>example-consumer</module>
         <module>example-provider</module>
         <module>bubble-rpc-easy</module>
+        <module>bubble-rpc-core</module>
     </modules>
 
     <properties>
@@ -26,6 +27,12 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>4.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

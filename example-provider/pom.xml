@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.bubble.rpc</groupId>
-            <artifactId>bubble-rpc-easy</artifactId>
+            <artifactId>bubble-rpc-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
