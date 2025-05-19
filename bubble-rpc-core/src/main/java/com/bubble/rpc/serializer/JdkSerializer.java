@@ -38,7 +38,7 @@ public class JdkSerializer implements Serializer{
      * @throws IOException
      */
     @Override
-    public <T> T desserialize(byte[] bytes, Class<T> clazz) throws IOException {
+    public <T> T deserialize(byte[] bytes, Class<T> clazz) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         try {

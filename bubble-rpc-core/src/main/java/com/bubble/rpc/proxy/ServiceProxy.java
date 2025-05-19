@@ -2,10 +2,11 @@ package com.bubble.rpc.proxy;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import com.bubble.rpc.RpcApplication;
 import com.bubble.rpc.model.RpcRequest;
 import com.bubble.rpc.model.RpcResponse;
-import com.bubble.rpc.serializer.JdkSerializer;
 import com.bubble.rpc.serializer.Serializer;
+import com.bubble.rpc.serializer.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -17,20 +18,6 @@ import java.lang.reflect.Method;
 public class ServiceProxy implements InvocationHandler {
     /**
      * 调用代理
-     * @param proxy the proxy instance that the method was invoked on
-     *
-     * @param method the {@code Method} instance corresponding to
-     * the interface method invoked on the proxy instance.  The declaring
-     * class of the {@code Method} object will be the interface that
-     * the method was declared in, which may be a superinterface of the
-     * proxy interface that the proxy class inherits the method through.
-     *
-     * @param args an array of objects containing the values of the
-     * arguments passed in the method invocation on the proxy instance,
-     * or {@code null} if interface method takes no arguments.
-     * Arguments of primitive types are wrapped in instances of the
-     * appropriate primitive wrapper class, such as
-     * {@code java.lang.Integer} or {@code java.lang.Boolean}.
      *
      * @return
      * @throws Throwable
@@ -38,7 +25,7 @@ public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //指定序列化器
-        Serializer serializer = new JdkSerializer();
+        Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
 
         //构建请求
         RpcRequest rpcRequest = RpcRequest.builder()
@@ -57,7 +44,7 @@ public class ServiceProxy implements InvocationHandler {
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();
                 //反序列化
-                RpcResponse rpcResponse = serializer.desserialize(result, RpcResponse.class);
+                RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
                 return rpcResponse.getData();
             }
 

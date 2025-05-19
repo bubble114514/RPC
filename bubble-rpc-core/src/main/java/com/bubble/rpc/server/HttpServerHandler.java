@@ -8,11 +8,13 @@ package com.bubble.rpc.server;
  *      4、对返回结果进行封装和序列化，并写入到响应中
  */
 
+import com.bubble.rpc.RpcApplication;
 import com.bubble.rpc.model.RpcRequest;
 import com.bubble.rpc.model.RpcResponse;
 import com.bubble.rpc.registry.LocalRegistry;
 import com.bubble.rpc.serializer.JdkSerializer;
 import com.bubble.rpc.serializer.Serializer;
+import com.bubble.rpc.serializer.SerializerFactory;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -28,7 +30,8 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(HttpServerRequest request) {
         //指定序列化器
-        final Serializer serializer = new JdkSerializer();
+        final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
+
 
         //记录日志
         System.out.println("Received request: " + request.method() + " " + request.uri());
@@ -38,7 +41,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
             byte[] bytes = body.getBytes();
             RpcRequest rpcRequest =null;
             try {
-                rpcRequest =serializer.desserialize(bytes, RpcRequest.class);
+                rpcRequest =serializer.deserialize(bytes, RpcRequest.class);
             }catch (Exception e){
                 e.printStackTrace();
             }

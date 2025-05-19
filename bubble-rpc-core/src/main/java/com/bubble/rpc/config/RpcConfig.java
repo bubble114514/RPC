@@ -1,5 +1,6 @@
 package com.bubble.rpc.config;
 
+import com.bubble.rpc.serializer.SerializerKeys;
 import lombok.Data;
 
 @Data
@@ -24,4 +25,8 @@ public class RpcConfig {
      * 模拟调用
      */
     private boolean mock=false;
+    /**
+     * 序列化器
+     */
+    private String serializer= SerializerKeys.JDK;
 }
