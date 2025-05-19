@@ -2,7 +2,6 @@ package com.bubble.rpc;
 
 import com.bubble.rpc.common.model.User;
 import com.bubble.rpc.common.service.UserService;
-import com.bubble.rpc.proxy.ServiceProxy;
 import com.bubble.rpc.proxy.ServiceProxyFactory;
 
 public class EasyConsumerExample {
