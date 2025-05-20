@@ -2,7 +2,10 @@
 package com.bubble.rpc;
 
 
+import com.bubble.rpc.config.RegistryConfig;
 import com.bubble.rpc.constant.RpcConstant;
+import com.bubble.rpc.registry.Registry;
+import com.bubble.rpc.registry.RegistryFactory;
 import com.bubble.rpc.utils.ConfigUtils;
 import lombok.extern.slf4j.Slf4j;
 import com.bubble.rpc.config.RpcConfig;
@@ -21,6 +24,14 @@ public class RpcApplication {
     public static void init(RpcConfig newRpcConfig) {
         rpcConfig = newRpcConfig;
         log.info("rpc init, config = {}", newRpcConfig.toString());
+        //注册中心初始化
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        registry.init(registryConfig);
+        log.info("registry init, registry = {}", registry.getClass().getName());
+
+        //创建并注册Shutdown Hook ，JVM退出时执行
+        Runtime.getRuntime().addShutdownHook(new Thread(registry::destroy));
     }
     /**
      * 初始化

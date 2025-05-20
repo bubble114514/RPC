@@ -11,6 +11,8 @@ import com.bubble.rpc.utils.ConfigUtils;
  */
 public class ConsumerExample {
     public static void main(String[] args) {
+//        // 服务提供者初始化
+//        ConsumerBootstrap.init();
         //获取代理
         UserService userService = ServiceProxyFactory.getProxy(UserService.class);
         User user = new User();

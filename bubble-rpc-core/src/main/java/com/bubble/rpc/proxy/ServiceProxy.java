@@ -3,14 +3,20 @@ package com.bubble.rpc.proxy;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.bubble.rpc.RpcApplication;
+import com.bubble.rpc.config.RpcConfig;
+import com.bubble.rpc.constant.RpcConstant;
 import com.bubble.rpc.model.RpcRequest;
 import com.bubble.rpc.model.RpcResponse;
+import com.bubble.rpc.model.ServiceMetaInfo;
+import com.bubble.rpc.registry.Registry;
+import com.bubble.rpc.registry.RegistryFactory;
 import com.bubble.rpc.serializer.Serializer;
 import com.bubble.rpc.serializer.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * 服务代理（JDK动态代理）
@@ -27,9 +33,11 @@ public class ServiceProxy implements InvocationHandler {
         //指定序列化器
         Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
 
+        String serviceName = method.getDeclaringClass().getName();
+
         //构建请求
         RpcRequest rpcRequest = RpcRequest.builder()
-                .serviceName(method.getDeclaringClass().getName())
+                .serviceName(serviceName)
                 .methodName(method.getName())
                 .parameterTypes(method.getParameterTypes())
                 .args(args)
@@ -37,9 +45,20 @@ public class ServiceProxy implements InvocationHandler {
         try {
             //序列化
             byte[] bodyBytes = serializer.serialize(rpcRequest);
+            //从注册中心获取服务提供者请求地址
+            RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            Registry registry = RegistryFactory.getInstance(rpcConfig.getRegistryConfig().getRegistry());
+            ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
+            serviceMetaInfo.setServiceName(serviceName);
+            serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
+            List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
+            if (serviceMetaInfoList == null || serviceMetaInfoList.isEmpty()){
+                throw new RuntimeException("暂无服务地址");
+            }
+            // 暂时先取第一个
+            ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
             //发送请求
-            //TODO 注意，这里地址被硬编码了（需使用注册中心和服务发现机制解决）
-            try (HttpResponse httpResponse = HttpRequest.post("http://localhost:8080")
+            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
                     .body(bodyBytes)
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();
