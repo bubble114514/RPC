@@ -1,22 +1,29 @@
 package com.bubble.rpc.proxy;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
+import cn.hutool.core.util.IdUtil;
 import com.bubble.rpc.RpcApplication;
 import com.bubble.rpc.config.RpcConfig;
+import com.bubble.rpc.constant.ProtocolConstant;
 import com.bubble.rpc.constant.RpcConstant;
 import com.bubble.rpc.model.RpcRequest;
 import com.bubble.rpc.model.RpcResponse;
 import com.bubble.rpc.model.ServiceMetaInfo;
+import com.bubble.rpc.protocol.*;
 import com.bubble.rpc.registry.Registry;
 import com.bubble.rpc.registry.RegistryFactory;
 import com.bubble.rpc.serializer.Serializer;
 import com.bubble.rpc.serializer.SerializerFactory;
+import com.bubble.rpc.server.tcp.VertxTcpClient;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetSocket;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 服务代理（JDK动态代理）
@@ -57,20 +64,14 @@ public class ServiceProxy implements InvocationHandler {
             }
             // 暂时先取第一个
             ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
-            //发送请求
-            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
-                    .body(bodyBytes)
-                    .execute()) {
-                byte[] result = httpResponse.bodyBytes();
-                //反序列化
-                RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
-                return rpcResponse.getData();
-            }
+            //发送TCP请求
+            RpcResponse rpcResponse = VertxTcpClient.doRequset(rpcRequest, selectedServiceMetaInfo);
+            return rpcResponse.getData();
+
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("调用失败");
         }
 
-        return null;
     }
 }

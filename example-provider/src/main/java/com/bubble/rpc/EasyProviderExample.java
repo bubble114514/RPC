@@ -16,9 +16,7 @@ public class EasyProviderExample {
         ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
         serviceMetaInfo.setServiceName(UserService.class.getName());
         serviceMetaInfo.setServiceVersion("1.0");
-        serviceMetaInfo.setServiceHost(RpcApplication.getRpcConfig().getServerHost());
-        serviceMetaInfo.setServicePort(RpcApplication.getRpcConfig().getServerPort());
-        serviceMetaInfo.setServiceGroup(RpcApplication.getRpcConfig().getName());
+
 
         // 初始化并注册服务
         EtcdRegistry etcdRegistry = new EtcdRegistry();
@@ -29,6 +27,6 @@ public class EasyProviderExample {
 
         // 启动web服务
         HttpServer httpServer = new VertxHttpServer();
-        httpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
+        httpServer.doStart(8080);
     }
 }

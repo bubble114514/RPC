@@ -129,7 +129,7 @@ public class EtcdRegistry implements Registry {
         long leaseId = leaseClient.grant(30L).get().getID();
 
         //设置要存储的键值对
-        String registryKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceVersion();
+        String registryKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registryKey, StandardCharsets.UTF_8);
         ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMetaInfo), StandardCharsets.UTF_8);
 
@@ -178,7 +178,7 @@ public class EtcdRegistry implements Registry {
 
             //写入服务缓存
             registryServiceCache.writeCache(serviceMetaInfoList);
-            return cacheServiceMetaInfoList;
+            return serviceMetaInfoList;
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
         }
