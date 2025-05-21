@@ -1,5 +1,6 @@
 package com.bubble.rpc.config;
 
+import com.bubble.rpc.fault.retry.RetryStrategyKeys;
 import com.bubble.rpc.loadbalancer.LoadBalancerKeys;
 import com.bubble.rpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -38,4 +39,8 @@ public class RpcConfig {
      * 负载均衡
      */
     private String loadBalancer= LoadBalancerKeys.ROUND_ROBIN;
+    /**
+     * 重试策略
+     */
+    private String retryStrategy= RetryStrategyKeys.NO;
 }

@@ -1,0 +1,2 @@
+no=com.bubble.rpc.fault.retry.NoRetryStrategy
+fixedInterval=com.bubble.rpc.fault.retry.FixedIntervalRetryStrategy
