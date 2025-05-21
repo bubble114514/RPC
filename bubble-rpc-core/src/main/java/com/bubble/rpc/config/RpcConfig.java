@@ -1,6 +1,7 @@
 package com.bubble.rpc.config;
 
 import com.bubble.rpc.fault.retry.RetryStrategyKeys;
+import com.bubble.rpc.fault.tolerate.TolerantStrategyKeys;
 import com.bubble.rpc.loadbalancer.LoadBalancerKeys;
 import com.bubble.rpc.serializer.SerializerKeys;
 import lombok.Data;
@@ -43,4 +44,8 @@ public class RpcConfig {
      * 重试策略
      */
     private String retryStrategy= RetryStrategyKeys.NO;
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy= TolerantStrategyKeys.FAIL_FAST;
 }

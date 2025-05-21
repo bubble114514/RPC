@@ -7,6 +7,8 @@ import com.bubble.rpc.constant.ProtocolConstant;
 import com.bubble.rpc.constant.RpcConstant;
 import com.bubble.rpc.fault.retry.RetryStrategy;
 import com.bubble.rpc.fault.retry.RetryStrategyFactory;
+import com.bubble.rpc.fault.tolerate.TolerantStrategy;
+import com.bubble.rpc.fault.tolerate.TolerantStrategyFactory;
 import com.bubble.rpc.loadbalancer.LoadBalancer;
 import com.bubble.rpc.loadbalancer.LoadBalancerFactory;
 import com.bubble.rpc.model.RpcRequest;
@@ -77,9 +79,16 @@ public class ServiceProxy implements InvocationHandler {
 
             //发送TCP请求
             //使用重试机制
-            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
-            RpcResponse rpcResponse =retryStrategy.doRetry(()->
-                    VertxTcpClient.doRequset(rpcRequest,selectedServiceMetaInfo));
+            RpcResponse rpcResponse;
+            try {
+                RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+                rpcResponse = retryStrategy.doRetry(() ->
+                        VertxTcpClient.doRequset(rpcRequest, selectedServiceMetaInfo));
+            }catch (Exception e){
+                //容错机制
+                TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+                rpcResponse = tolerantStrategy.doTolerant(null, e);
+            }
 
             return rpcResponse.getData();
 

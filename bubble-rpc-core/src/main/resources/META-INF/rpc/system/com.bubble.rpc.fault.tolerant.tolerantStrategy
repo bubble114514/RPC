@@ -1,0 +1,4 @@
+failBack=com.bubble.rpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.bubble.rpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.bubble.rpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.bubble.rpc.fault.tolerant.FailSafeTolerantStrategy
