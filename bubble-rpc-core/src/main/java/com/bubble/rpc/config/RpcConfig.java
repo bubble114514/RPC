@@ -1,5 +1,6 @@
 package com.bubble.rpc.config;
 
+import com.bubble.rpc.loadbalancer.LoadBalancerKeys;
 import com.bubble.rpc.serializer.SerializerKeys;
 import lombok.Data;
 
@@ -33,4 +34,8 @@ public class RpcConfig {
      * 注册中心配置
      */
     private RegistryConfig registryConfig=new RegistryConfig();
+    /**
+     * 负载均衡
+     */
+    private String loadBalancer= LoadBalancerKeys.ROUND_ROBIN;
 }

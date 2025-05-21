@@ -1,7 +1,6 @@
 package com.bubble.rpc.model;
 
 import cn.hutool.core.util.StrUtil;
-import io.netty.util.internal.StringUtil;
 import lombok.Data;
 
 /**

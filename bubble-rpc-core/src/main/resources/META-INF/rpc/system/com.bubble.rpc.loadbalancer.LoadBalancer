@@ -1,0 +1,3 @@
+roundRobin=com.bubble.rpc.loadbalancer.RoundRobinLoadBalancer
+random=com.bubble.rpc.loadbalancer.RandomLoadBalancer
+consistentHash=com.bubble.rpc.loadbalancer.ConsistentHashLoadBalancer
