@@ -14,6 +14,11 @@
         <module>example-provider</module>
         <module>bubble-rpc-easy</module>
         <module>bubble-rpc-core</module>
+        <module>bubble-rpc-spring-boot-starter</module>
+        <module>springboot-consumer</module>
+
+
+
     </modules>
 
     <properties>
