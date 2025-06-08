@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 
@@ -150,13 +152,35 @@ public class EtcdRegistry implements Registry {
         localRegistryKeySet.remove(registryKey);
     }
 
-    @Override
+
+    //使用读写锁解决线程安全问题
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
-        //优先从缓存获取服务
-        List<ServiceMetaInfo> cacheServiceMetaInfoList = registryServiceCache.readCache();
-        if (cacheServiceMetaInfoList!=null){
-            return cacheServiceMetaInfoList;
+        // 读锁（允许多线程并发读）
+        rwLock.readLock().lock();
+        try {
+            List<ServiceMetaInfo> cacheList = registryServiceCache.readCache();
+            if (cacheList != null) return cacheList;
+        } finally {
+            rwLock.readLock().unlock();
         }
+
+        // 写锁（互斥写）
+        rwLock.writeLock().lock();
+        try {
+            // 双重检查
+            List<ServiceMetaInfo> cacheList = registryServiceCache.readCache();
+            if (cacheList != null) return cacheList;
+
+            cacheList = doDiscoveryFromEtcd(serviceKey);
+            registryServiceCache.writeCache(cacheList);
+            return cacheList;
+        } finally {
+            rwLock.writeLock().unlock();
+        }
+    }
+
+    private List<ServiceMetaInfo> doDiscoveryFromEtcd(String serviceKey) {
         //前缀搜索，结尾记得加‘/’
         String searchPrefix = ETCD_ROOT_PATH + serviceKey + "/";
         try {
@@ -182,8 +206,6 @@ public class EtcdRegistry implements Registry {
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
         }
-
-
     }
 
     @Override
